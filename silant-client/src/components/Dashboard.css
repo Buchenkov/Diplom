@@ -1,0 +1,89 @@
+
+.custom-header, .custom-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #163E6C;
+    color: white;
+    padding: 20px;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.logo-image {
+    max-height: 50px;
+}
+
+.contact-box {
+    display: flex;
+    align-items: center;
+}
+
+.auth-button {
+    background-color: #ff5722;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    margin-left: 20px;
+}
+
+.intro-text {
+    margin-top: 10px;
+    font-size: 18px;
+    text-align: center;
+}
+
+.main-content {
+    margin-top: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.main-title, .info-box, .data-box {
+    margin-top: 20px;
+    font-size: 18px;
+    text-align: center;
+}
+
+.info-box, .data-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.button-group Button {
+    margin: 0 10px;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.data-table th, .data-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.footer-box {
+    margin-top: 10px;
+    font-size: 14px;
+}

@@ -1,0 +1,72 @@
+бек:
+    cd silant_project
+    python manage.py runserver
+
+фронт:
+    cd silant_project
+    cd silant-client
+    npm start
+
+-------------------------------
+Клиентская    -------- Зендер   пароль: Зендер
+Сервисная компания --- Силант   пароль: Силант
+Менеджер      -------- menr     пароль: menr
+
+-------------------------------
+
+python manage.py update_passwords
+для хеширования поролей!!!!!!!!!!!
+
+-------------------------------
+
+
+Select Interpreter -  (Ctrl + Shift + P)
+
+.venv\scripts\activate
+
+python -m pip install --upgrade pip
+
+python -m pip install django
+    или
+    # Установка Django и других пакетов             (пакет django-rest-auth больше не поддерживается)
+    pip install django djangorestframework django-allauth djangorestframework-simplejwt dj-rest-auth requests psycopg2-binary
+
+    pip install requests
+
+django-admin startproject web_project .
+
+python manage.py migrate    - Создайте пустую базу данных для своего проекта.  
+
+python manage.py runserver
+
+
+# Создание нового приложения
+python manage.py startapp silant_app
+
+# Для MySQL
+pip install mysqlclient
+
+
+# Создание миграций
+python manage.py makemigrations
+
+# Применение миграций
+python manage.py migrate
+
+
+python manage.py createsuperuser
+
+python manage.py runserver
+
+
+
+
+
+
+*   __init__.py: пустой файл, сообщающий Python, что эта папка является пакетом Python.
+*   asgi.py: точка входа для совместимых с ASGI веб-серверов для обслуживания вашего проекта. 
+    Обычно вы оставляете этот файл без изменений, так как он содержит функции для производственных веб-серверов.
+*   settings.pyсодержит настройки для проекта Django, которые вы изменяете в процессе разработки веб-приложения.
+*   urls.pyсодержит оглавление для проекта Django, которое вы также изменяете в процессе разработки.
+*   wsgi.py: точка входа для веб-серверов, совместимых с WSGI, для обслуживания вашего проекта. 
+    Обычно вы оставляете этот файл без изменений, так как он обеспечивает взаимодействие с производственными веб-серверами.

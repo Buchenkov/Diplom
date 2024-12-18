@@ -1,0 +1,170 @@
+/* 
+@font-face {
+    font-family: 'PT Astra Sans';
+    src: url('/PT%20Astra%20Sans/PT-Astra-Sans_Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'PT Astra Sans';
+    src: url('/PT%20Astra%20Sans/PT-Astra-Sans_Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'PT Astra Sans';
+    src: url('/PT%20Astra%20Sans/PT-Astra-Sans_Italic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'PT Astra Sans';
+    src: url('/PT%20Astra%20Sans/PT-Astra-Sans_Bold-Italic.ttf') format('truetype');
+    font-weight: bold;
+    font-style: italic;
+} */
+
+body {
+    font-family: 'PT Astra Sans', sans-serif;
+    color: #163E6C;
+}
+
+.user-info-box, .info-box {
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px; /* Отступ снизу для разделения */
+    display: inline-block;
+    width: 100%; /* Устанавливаем ширину в 100%, чтобы занять всю доступную ширину */
+    box-sizing: border-box; /* Учитываем внутренние отступы и границы в ширину элемента */
+  }
+
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Для плавной прокрутки на мобильных устройствах */
+  }
+
+.custom-header, .custom-footer, .main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #EBE6D6;
+}
+
+.custom-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #163E6C;
+    color: #163E6C;
+    padding: 20px;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.intro-text {
+    margin-top: 10px;
+    font-size: 18px;
+    text-align: center;
+}
+
+
+ .intro-text-container {
+    background-color: white;
+    width: 100%;
+    padding: 12px 0; 
+    text-align: center;
+    border-radius: 10px;
+    margin-top: 10px; 
+    font-size: 12px;
+    line-height: 1.2;
+} 
+
+
+
+
+.logo-image {
+    max-width: 100px; /* Выберите подходящий размер */
+    height: auto;
+}
+
+.contact-box, .footer-box {
+    background-color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+}
+
+.auth-button {
+    background-color: #D20A11;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.main-content {
+    margin-top: 20px;
+}
+
+.info-box, .data-table  {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.search-box input[type="text"] {
+    padding: 10px;
+    margin-right: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    flex: 1;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+.custom-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #163E6C;
+    color: #163E6C;
+    margin-top: 20px;
+    padding: 20px;
+}
+
+@media (max-width: 768px) {
+    .custom-header, .custom-footer, .main-content {
+        padding: 10px;
+    }
+    .search-box {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .search-box input[type="text"] {
+        margin-bottom: 10px;
+    }
+}
