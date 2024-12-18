@@ -65,8 +65,9 @@ const Dashboard = () => {
                   api.get('/machines/')
                     .then(response => {
                       console.log('Machines:', response.data);
-                      const filteredMachines = response.data.filter(machine => machine.service_company === serviceCompany.id);
-                      console.log('Filtered Machines:', filteredMachines);
+                      // const filteredMachines = response.data.filter(machine => machine.service_company === serviceCompany.id);
+                      const filteredMachines = response.data.filter(machine => machine.service_company.id === serviceCompany.id);
+                      console.log('Filtered Machines!:', filteredMachines);
                       setMachines(filteredMachines);
                       if (filteredMachines.length > 0) {
                         setSelectedMachineSerialNumber(filteredMachines[0].serial_number);
@@ -79,15 +80,22 @@ const Dashboard = () => {
               } else {
                 api.get('/machines/')
                   .then(response => {
-                    console.log('Machines:', response.data);
+                    console.log(userId)
+                    console.log('Machines!!:', response.data);
                     let filteredMachines = response.data;
                     if (userRole === 'client') {
-                      filteredMachines = response.data.filter(machine => machine.client === userId);
+                      response.data.forEach(machine => {
+                        console.log(`Machine ID: ${machine.id}, Supply Contact: ${machine.supply_contact}, Full Machine Data:, machine);}`);
+                      });
+                      // filteredMachines = response.data.filter(machine => machine.client === userId);
+                      filteredMachines = response.data.filter(machine => 
+                        machine.supply_contract === username || machine.end_user.includes(username));
                     }
                     console.log('Filtered Machines:', filteredMachines);
                     setMachines(filteredMachines);
                     if (filteredMachines.length > 0) {
                       setSelectedMachineSerialNumber(filteredMachines[0].serial_number);
+                      console.log('!!!!!!!!!    machines:', setSelectedMachineSerialNumber);
                     }
                   })
                   .catch(error => console.error('Error fetching machines:', error));
@@ -203,7 +211,7 @@ const Dashboard = () => {
 
   const getDriveAxleModelName = (driveAxleModel) => {
     if (typeof driveAxleModel === 'object' && driveAxleModel !== null && 'id' in driveAxleModel && 'name' in driveAxleModel) {
-      console.log('Drive Axle Model ID:', driveAxleModel.id, 'Drive Axle Model:', driveAxleModel);
+      // console.log('Drive Axle Model ID:', driveAxleModel.id, 'Drive Axle Model:', driveAxleModel);
       return driveAxleModel.name;
     } else {
       console.log('Некорректный входной параметр:', driveAxleModel);
@@ -213,7 +221,7 @@ const Dashboard = () => {
     
   const getSteerAxleModelName = (steerAxleModel) => {
     if (typeof steerAxleModel === 'object' && steerAxleModel !== null && 'id' in steerAxleModel && 'name' in steerAxleModel) {
-      console.log('Steer Axle Model ID:', steerAxleModel.id, 'Steer Axle Model:', steerAxleModel);
+      // console.log('Steer Axle Model ID:', steerAxleModel.id, 'Steer Axle Model:', steerAxleModel);
       return steerAxleModel.name;
     } else {
       console.log('Некорректный входной параметр:', steerAxleModel);
