@@ -39,6 +39,11 @@ const Dashboard = () => {
     driveAxleModel: '',
   });
 
+  // const [maintenanceFilters, setMaintenanceFilters] = useState({
+  //   type: '',
+  //   machineSerial: '',
+  //   serviceCompany: '',
+  // });
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -153,6 +158,8 @@ const Dashboard = () => {
         console.log('Selected Machine TO ID:', machineId);
         api.get('/maintenances/')
           .then(response => {
+            const sortedMaintenances = response.data.sort((a, b) => new Date(a.date) - new Date(b.date));
+          setMaintenances(sortedMaintenances);
             const filteredMaintenances = response.data.filter(
               maintenance => maintenance.machine === machineId
             );
@@ -276,20 +283,24 @@ const Dashboard = () => {
     getSteerAxleModelName(machine.steer_axle_model).toLowerCase().includes(filters.steerAxleModel.toLowerCase())
   );
 
-  // const filteredMachines = machines.filter(machine => 
-  //   machine.model.toLowerCase().includes(filters.model.toLowerCase()) &&
-  //   machine.engine_model.name.toLowerCase().includes(filters.engineModel.toLowerCase()) &&
-  //   machine.transmission_model.name.toLowerCase().includes(filters.transmissionModel.toLowerCase()) &&
-  //   getDriveAxleModelName(machine.drive_axle_model).toLowerCase().includes(filters.driveAxleModel.toLowerCase()) &&
-  //   getSteerAxleModelName(machine.steerAxleModel).toLowerCase().includes(filters.steerAxleModel.toLowerCase())
-  // );
-
-
-  
   const handleMachineSelect = (serialNumber) => {
     console.log('Machine selected:', serialNumber);
     setSelectedMachineSerialNumber(serialNumber);
   };
+
+    // Применение фильтров для рекламаций
+  // const filteredMaintenances = maintenances.filter(maintenance => 
+  //   maintenance.type_name.toLowerCase().includes(maintenanceFilters.type.toLowerCase()) &&
+  //   maintenance.machine_serial_number.toLowerCase().includes(maintenanceFilters.machineSerial.toLowerCase()) &&
+  //   maintenance.service_company_name.toLowerCase().includes(maintenanceFilters.serviceCompany.toLowerCase())
+  // );
+
+  // const handleMaintenanceFilterChange = (e) => {
+  //   setMaintenanceFilters({
+  //     ...maintenanceFilters,
+  //     [e.target.name]: e.target.value,
+  //   });
+  // };
 
   const canAddMachine = userInfo && userInfo.role === 'manager';
   const canAddMaintenance = userInfo && (userInfo.role === 'client' || userInfo.role === 'service' || userInfo.role === 'manager');
