@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 
 import logging
 
-from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializer
@@ -27,7 +27,7 @@ from rest_framework.response import Response
 
 from rest_framework import viewsets
 from .models import Machine
-from .serializers import MachineSerializer
+from .serializers import MachineSerializer, MaintenanceSerializer, ReclamationSerializer
    
 
 
@@ -172,3 +172,19 @@ def login_view(request):
             return JsonResponse({'message': 'Ошибка при обработке запроса'}, status=500)
     return JsonResponse({'message': 'Метод не поддерживается'}, status=405)
 
+
+
+class MaintenanceListView(APIView):
+       def get(self, request, *args, **kwargs):
+           maintenances = Maintenance.objects.all()
+           serializer = MaintenanceSerializer(maintenances, many=True)
+           print(serializer.data)  # Вывод данных в консоль для проверки
+           return Response(serializer.data)
+   
+
+class ReclamationListView(APIView):
+    def get(self, request, *args, **kwargs):
+        reclamations = Reclamation.objects.all()
+        serializer = ReclamationSerializer(reclamations, many=True)
+        return Response(serializer.data)
+    

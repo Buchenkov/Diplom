@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import UserViewSet, ClientViewSet, ServiceCompanyViewSet, MachineViewSet, TypeToViewSet, MaintenanceViewSet, RecoveryMethodViewSet, FailureNodeViewSet, ReclamationViewSet, search_machine_by_serial_number, user_info
 from .views import CustomAuthToken
 from django.contrib.auth import views as auth_views
+from .views import MaintenanceListView, ReclamationListView
 # from . import views
 # from .views import login_view
 
@@ -25,7 +26,8 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('search_machine/', search_machine_by_serial_number, name='search_machine_by_serial_number'),
     path('user-info/', user_info, name='user_info'),
-
+    path('api/maintenances/', MaintenanceListView.as_view(), name='maintenance-list'),
+    path('api/reclamations/', ReclamationListView.as_view(), name='reclamation-list'),
     path('api/user-info/', user_info, name='user_info'),
     path('', include(router.urls)),
 ]

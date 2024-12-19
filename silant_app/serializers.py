@@ -1,5 +1,35 @@
 from rest_framework import serializers
-from .models import User, Client, ServiceCompany, Machine, TypeTo, Maintenance, RecoveryMethod, FailureNode, Reclamation, Engine, Transmission, BridgeA, BridgeB, ModelMashine
+from .models import *
+
+class TypeToSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TypeTo
+        fields = '__all__'
+
+class RecoveryMethodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RecoveryMethod
+        fields = '__all__'
+
+class FailureNodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FailureNode
+        fields = '__all__'
+
+class ReclamationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reclamation
+        fields = '__all__'
+
+class MachineLimitedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Machine
+        fields = 'all'
+
+class ModelMashineSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ModelMashine
+        fields = ['id', 'name']
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -51,115 +81,37 @@ class MachineSerializer(serializers.ModelSerializer):
 
     def get_model(self, obj):
         return obj.model.name if obj.model else 'Не указана'
+    
 
-class TypeToSerializer(serializers.ModelSerializer):
+class ToSerializer(serializers.ModelSerializer):
     class Meta:
         model = TypeTo
-        fields = '__all__'
+        fields = ['id', 'name']
+    
+
+class MachineToSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Machine
+        fields = ['serial_number']
+
 
 class MaintenanceSerializer(serializers.ModelSerializer):
+    machine_name = serializers.CharField(source='machine.serial_number', read_only=True)
+    type = serializers.CharField(source='type.name', read_only=True)
+    service_company = serializers.CharField(source='service_company.name', read_only=True)
+
     class Meta:
         model = Maintenance
         fields = '__all__'
 
-class RecoveryMethodSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RecoveryMethod
-        fields = '__all__'
-
-class FailureNodeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FailureNode
-        fields = '__all__'
 
 class ReclamationSerializer(serializers.ModelSerializer):
+    machine_name = serializers.CharField(source='machine.serial_number', read_only=True)
+    failure_node = serializers.CharField(source='failure_node.name', read_only=True)
+    recovery_method_name = serializers.CharField(source='recovery_method.name', read_only=True)
+
     class Meta:
         model = Reclamation
         fields = '__all__'
 
-class MachineLimitedSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Machine
-        fields = 'all'
-
-class ModelMashineSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ModelMashine
-        fields = ['id', 'name']
-
-
-# from rest_framework import serializers
-# from .models import User, Client, ServiceCompany, Machine, TypeTo, Maintenance, RecoveryMethod, FailureNode, Reclamation, Engine, Transmission, BridgeA, BridgeB
-
-# class UserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ('id', 'username', 'email', 'role')
-#         # fields = '__all__'
-
-# class EngineModelSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Engine
-#         fields = '__all__'
-
-# class TransmissionModelSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Transmission
-#         fields = '__all__'
-
-# class BridgeASerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = BridgeA
-#         fields = '__all__'
-
-# class BridgeBSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = BridgeB
-#         fields = '__all__'
-
-# class ClientSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Client
-#         fields = '__all__'
-
-# class ServiceCompanySerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = ServiceCompany
-#         fields = '__all__'
-
-# class MachineSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Machine
-#         fields = '__all__'
-
-# class TypeToSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = TypeTo
-#         fields = '__all__'
-
-# class MaintenanceSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Maintenance
-#         fields = '__all__'
-
-# class RecoveryMethodSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = RecoveryMethod
-#         fields = '__all__'
-
-# class FailureNodeSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = FailureNode
-#         fields = '__all__'
-
-# class ReclamationSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Reclamation
-#         fields = '__all__'
-
-# class MachineLimitedSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Machine
-#         fields = '__all__'
-#         # fields = ('serial_number', 'model', 'engine_model', 'engine_serial_number', 'transmission_model', 'transmission_serial_number', 'drive_axle_model', 'drive_axle_serial_number', 'steer_axle_model', 'steer_axle_serial_number')
 

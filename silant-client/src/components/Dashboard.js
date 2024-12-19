@@ -95,7 +95,7 @@ const Dashboard = () => {
                     setMachines(filteredMachines);
                     if (filteredMachines.length > 0) {
                       setSelectedMachineSerialNumber(filteredMachines[0].serial_number);
-                      console.log('!!!!!!!!!    machines:', setSelectedMachineSerialNumber);
+                      // console.log('!!!!!!!!!    machines:', setSelectedMachineSerialNumber);
                     }
                   })
                   .catch(error => console.error('Error fetching machines:', error));
@@ -112,13 +112,13 @@ const Dashboard = () => {
       const selectedMachine = machines.find(machine => machine.serial_number === selectedMachineSerialNumber);
       if (selectedMachine) {
         const machineId = selectedMachine.id;
-        console.log('Selected Machine ID:', machineId);
+        console.log('Selected Machine TO ID:', machineId);
         api.get('/maintenances/')
           .then(response => {
             const filteredMaintenances = response.data.filter(
               maintenance => maintenance.machine === machineId
             );
-            console.log('Filtered Maintenances:', filteredMaintenances);
+            console.log('Filtered Maintenances!!!:', filteredMaintenances);
             setMaintenances(filteredMaintenances);
           })
           .catch(error => console.error('Ошибка при получении данных ТО:', error));
@@ -364,10 +364,14 @@ const Dashboard = () => {
           <Table striped bordered hover>
             <thead>
               <tr>
-                <th>Дата</th>
+                <th>Вид ТО</th>
+                <th>Дата проведения ТО</th>
                 <th>Операционные часы</th>
-                <th>Номер заказа</th>
-                <th>Дата заказа</th>
+                <th>№ заказ-наряда</th>
+                <th>Дата заказ-наряда</th>
+                <th>Организация, проводившая ТО</th>
+                <th>Машина</th>
+                {/* <th>Сервисная компания</th> */}
                 <th>Действия</th>
               </tr>
             </thead>
@@ -375,10 +379,14 @@ const Dashboard = () => {
               {maintenances.length > 0 ? (
                 maintenances.map((maintenance) => (
                   <tr key={maintenance.id}>
+                    <td>{maintenance.type}</td>
                     <td>{maintenance.date}</td>
                     <td>{maintenance.operating_hours}</td>
                     <td>{maintenance.order_number}</td>
                     <td>{maintenance.order_date}</td>
+                    <td>{maintenance.service_company}</td>
+                    <td>{maintenance.machine_name}</td>
+                    {/* <td>{maintenance.service_company_name}</td> */}
                     <td>
                       {canAddMaintenance && (
                         <>
@@ -403,11 +411,14 @@ const Dashboard = () => {
             <thead>
               <tr>
                 <th>Дата отказа</th>
+                <th>Наработка, м/час</th>
+                <th>Узел отказа</th>
                 <th>Описание</th>
-                <th>Метод восстановления</th>
-                <th>Запчасти</th>
+                <th>Способ восстановления</th>
+                <th>Используемые запасные части</th>
                 <th>Дата восстановления</th>
-                <th>Простой (часы)</th>
+                <th>Время простоя техники</th>
+                <th>Mашина</th>
                 <th>Действия</th>
               </tr>
             </thead>
@@ -416,11 +427,14 @@ const Dashboard = () => {
                 reclamations.map((reclamation) => (
                   <tr key={reclamation.id}>
                     <td>{reclamation.failure_date}</td>
+                    <td>{reclamation.operating_hours}</td>
+                    <td>{reclamation.failure_node}</td>
                     <td>{reclamation.description}</td>
                     <td>{getRecoveryMethodName(reclamation.recovery_method)}</td>
                     <td>{reclamation.spare_parts}</td>
                     <td>{reclamation.restoration_date}</td>
                     <td>{reclamation.downtime}</td>
+                    <td>{reclamation.machine_name}</td>
                     <td>
                       {canAddReclamation && (
                         <>

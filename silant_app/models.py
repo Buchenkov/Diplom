@@ -117,7 +117,7 @@ class Reclamation(models.Model):
     machine = models.ForeignKey('Machine', on_delete=models.CASCADE)
     failure_date = models.DateField("Дата отказа")
     operating_hours = models.IntegerField()
-    failure_node = models.ForeignKey('FailureNode', on_delete=models.CASCADE)
+    failure_node = models.ForeignKey('FailureNode', on_delete=models.CASCADE)  # узел отказа
     description = models.TextField()
     recovery_method = models.ForeignKey('RecoveryMethod', on_delete=models.CASCADE)
     spare_parts = models.TextField(blank=True, null=True)  # Позволяет полю быть пустым
