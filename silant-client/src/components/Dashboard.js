@@ -107,6 +107,23 @@ const Dashboard = () => {
     }
   }, [isAuthenticated]);
 
+    // // Сортировка машин по дате отгрузки
+    // const sortedMachines = [...machines].sort((a, b) => {
+    //   const dateA = new Date(a.shipment_date);
+    //   const dateB = new Date(b.shipment_date);
+    //   return dateA - dateB;
+    // });
+
+
+      // Сортировка машин по дате отгрузки
+  const sortedMachines = [...machines].sort((a, b) => new Date(a.shipment_date) - new Date(b.shipment_date));
+
+  // Сортировка ТО по дате проведения
+  const sortedMaintenances = [...maintenances].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  // Сортировка рекламаций по дате отказа
+  const sortedReclamations = [...reclamations].sort((a, b) => new Date(a.failure_date) - new Date(b.failure_date));
+
   useEffect(() => {
     if (selectedMachineSerialNumber) {
       const selectedMachine = machines.find(machine => machine.serial_number === selectedMachineSerialNumber);
@@ -309,7 +326,7 @@ const Dashboard = () => {
                   <th>Модель управляемого моста</th>
                   <th>Зав. № управляемого моста</th>
                   <th>Покупатель</th>
-                  <th>дата отправки</th>
+                  <th>Дата отгрузки с завода</th>
                   <th>Грузополучатель</th>
                   <th>Адрес поставки</th>
                   <th>Комплектация </th>
@@ -319,7 +336,7 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {machines.map((machine) => (
+                {sortedMachines.map((machine) => (
                   <tr
                     key={machine.id}
                     onClick={() => handleMachineSelect(machine.serial_number)}
@@ -360,6 +377,7 @@ const Dashboard = () => {
             </Table>
              </div>
           )}
+
 {activeTab === 'maintenances' && (
           <Table striped bordered hover>
             <thead>
@@ -377,7 +395,7 @@ const Dashboard = () => {
             </thead>
             <tbody>
               {maintenances.length > 0 ? (
-                maintenances.map((maintenance) => (
+                sortedMaintenances.map((maintenance) => (
                   <tr key={maintenance.id}>
                     <td>{maintenance.type}</td>
                     <td>{maintenance.date}</td>
@@ -424,7 +442,7 @@ const Dashboard = () => {
             </thead>
             <tbody>
               {reclamations.length > 0 ? (
-                reclamations.map((reclamation) => (
+                sortedReclamations.map((reclamation) => (
                   <tr key={reclamation.id}>
                     <td>{reclamation.failure_date}</td>
                     <td>{reclamation.operating_hours}</td>
