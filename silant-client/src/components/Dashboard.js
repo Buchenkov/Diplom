@@ -30,6 +30,15 @@ const Dashboard = () => {
   const [formData, setFormData] = useState({});
   const [isEditMode, setIsEditMode] = useState(false);
 
+  // Состояния для фильтров
+  const [filters, setFilters] = useState({
+    model: '',
+    engineModel: '',
+    transmissionModel: '',
+    steerAxleModel: '',
+    driveAxleModel: '',
+  });
+
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -80,8 +89,10 @@ const Dashboard = () => {
               } else {
                 api.get('/machines/')
                   .then(response => {
-                    console.log(userId)
-                    console.log('Machines!!:', response.data);
+                    // Сортируем машины по дате отгрузки с завода по умолчанию
+                    const sortedMachines = response.data.sort((a, b) => new Date(a.shipment_date) - new Date(b.shipment_date));
+                    setMachines(sortedMachines);
+
                     let filteredMachines = response.data;
                     if (userRole === 'client') {
                       response.data.forEach(machine => {
@@ -116,13 +127,23 @@ const Dashboard = () => {
 
 
       // Сортировка машин по дате отгрузки
-  const sortedMachines = [...machines].sort((a, b) => new Date(a.shipment_date) - new Date(b.shipment_date));
+  // const sortedMachines = [...machines].sort((a, b) => new Date(a.shipment_date) - new Date(b.shipment_date));
 
   // Сортировка ТО по дате проведения
   const sortedMaintenances = [...maintenances].sort((a, b) => new Date(a.date) - new Date(b.date));
 
   // Сортировка рекламаций по дате отказа
   const sortedReclamations = [...reclamations].sort((a, b) => new Date(a.failure_date) - new Date(b.failure_date));
+
+
+
+
+  const handleFilterChange = (e) => {
+    setFilters({
+      ...filters,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   useEffect(() => {
     if (selectedMachineSerialNumber) {
@@ -155,10 +176,6 @@ const Dashboard = () => {
     }
   }, [selectedMachineSerialNumber, machines]);
 
-  const handleMachineSelect = (serialNumber) => {
-    console.log('Machine selected:', serialNumber);
-    setSelectedMachineSerialNumber(serialNumber);
-  };
 
   const handleAddData = () => {
     setIsEditMode(false);
@@ -250,6 +267,30 @@ const Dashboard = () => {
     return methodId === 1 ? 'ремонт' : 'замена';
   };
 
+  // Применение фильтров
+  const filteredMachines = machines.filter(machine => 
+    machine.model.toLowerCase().includes(filters.model.toLowerCase()) &&
+    machine.engine_model.name.toLowerCase().includes(filters.engineModel.toLowerCase()) &&
+    machine.transmission_model.name.toLowerCase().includes(filters.transmissionModel.toLowerCase()) &&
+    getDriveAxleModelName(machine.drive_axle_model).toLowerCase().includes(filters.driveAxleModel.toLowerCase()) &&
+    getSteerAxleModelName(machine.steer_axle_model).toLowerCase().includes(filters.steerAxleModel.toLowerCase())
+  );
+
+  // const filteredMachines = machines.filter(machine => 
+  //   machine.model.toLowerCase().includes(filters.model.toLowerCase()) &&
+  //   machine.engine_model.name.toLowerCase().includes(filters.engineModel.toLowerCase()) &&
+  //   machine.transmission_model.name.toLowerCase().includes(filters.transmissionModel.toLowerCase()) &&
+  //   getDriveAxleModelName(machine.drive_axle_model).toLowerCase().includes(filters.driveAxleModel.toLowerCase()) &&
+  //   getSteerAxleModelName(machine.steerAxleModel).toLowerCase().includes(filters.steerAxleModel.toLowerCase())
+  // );
+
+
+  
+  const handleMachineSelect = (serialNumber) => {
+    console.log('Machine selected:', serialNumber);
+    setSelectedMachineSerialNumber(serialNumber);
+  };
+
   const canAddMachine = userInfo && userInfo.role === 'manager';
   const canAddMaintenance = userInfo && (userInfo.role === 'client' || userInfo.role === 'service' || userInfo.role === 'manager');
   const canAddReclamation = userInfo && (userInfo.role === 'service' || userInfo.role === 'manager');
@@ -311,6 +352,64 @@ const Dashboard = () => {
         </Row>
 
               {activeTab === 'machines' && (
+        <div>
+     <Form>
+            <Row className="align-items-center mb-3">
+              <Col><Form.Label>Модель техники</Form.Label></Col>
+              <Col><Form.Label>Модель двигателя</Form.Label></Col>
+              <Col><Form.Label>Модель трансмиссии</Form.Label></Col>
+              <Col><Form.Label>Модель управляемого моста</Form.Label></Col>
+              <Col><Form.Label>Модель ведущего моста</Form.Label></Col>
+            </Row>
+            <Row className="align-items-center">
+              <Col><Form.Control
+                  type="text"
+                  placeholder="Фильтр по модели техники"
+                  name="model"
+                  value={filters.model}
+                  onChange={handleFilterChange}
+                />
+              </Col>
+              <Col>
+                <Form.Control
+                  type="text"
+                  placeholder="Фильтр по модели двигателя"
+                  name="engineModel"
+                  value={filters.engineModel}
+                  onChange={handleFilterChange}
+                />
+              </Col>
+              <Col>
+                <Form.Control
+                  type="text"
+                  placeholder="Фильтр по модели трансмиссии"
+                  name="transmissionModel"
+                  value={filters.transmissionModel}
+                  onChange={handleFilterChange}
+                />
+              </Col>
+              <Col>
+                <Form.Control
+                  type="text"
+                  placeholder="Фильтр по модели управляемого моста"
+                  name="steerAxleModel"
+                  value={filters.steerAxleModel}
+                  onChange={handleFilterChange}
+                />
+              </Col>
+              <Col>
+                <Form.Control
+                  type="text"
+                  placeholder="Фильтр по модели ведущего моста"
+                  name="driveAxleModel"
+                  value={filters.driveAxleModel}
+                  onChange={handleFilterChange}
+                />
+              </Col>
+            </Row>
+          </Form>
+
+
                 <div className="table-responsive">
             <Table striped bordered hover>
               <thead>
@@ -336,7 +435,7 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {sortedMachines.map((machine) => (
+              {filteredMachines.map((machine) => (
                   <tr
                     key={machine.id}
                     onClick={() => handleMachineSelect(machine.serial_number)}
@@ -375,6 +474,7 @@ const Dashboard = () => {
                 ))}
               </tbody>
             </Table>
+             </div>
              </div>
           )}
 
