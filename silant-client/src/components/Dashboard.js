@@ -39,15 +39,17 @@ const Dashboard = () => {
     driveAxleModel: '',
   });
 
-  // const [maintenanceFilters, setMaintenanceFilters] = useState({
-  //   type: '',
-  //   machineSerial: '',
-  //   serviceCompany: '',
-  // });
+
+  const [maintenanceFilters, setMaintenanceFilters] = useState({
+    type: '',
+    machineSerialNumber: '',
+    serviceCompany: '',
+  });
+  
 
   useEffect(() => {
     if (isAuthenticated) {
-      console.log('Fetching user info');
+      // console.log('Fetching user info');
       api.get('/user-info/')
         .then(response => {
           console.log('User Info:', response.data);
@@ -69,7 +71,7 @@ const Dashboard = () => {
 
           api.get('/service-companies/')
             .then(response => {
-              console.log('Service Companies:', response.data);
+              // console.log('Service Companies:', response.data);
               setServiceCompanies(response.data);
 
               if (userRole === 'service') {
@@ -81,7 +83,7 @@ const Dashboard = () => {
                       console.log('Machines:', response.data);
                       // const filteredMachines = response.data.filter(machine => machine.service_company === serviceCompany.id);
                       const filteredMachines = response.data.filter(machine => machine.service_company.id === serviceCompany.id);
-                      console.log('Filtered Machines!:', filteredMachines);
+                      // console.log('Filtered Machines!:', filteredMachines);
                       setMachines(filteredMachines);
                       if (filteredMachines.length > 0) {
                         setSelectedMachineSerialNumber(filteredMachines[0].serial_number);
@@ -135,7 +137,7 @@ const Dashboard = () => {
   // const sortedMachines = [...machines].sort((a, b) => new Date(a.shipment_date) - new Date(b.shipment_date));
 
   // Сортировка ТО по дате проведения
-  const sortedMaintenances = [...maintenances].sort((a, b) => new Date(a.date) - new Date(b.date));
+  // const sortedMaintenances = [...maintenances].sort((a, b) => new Date(a.date) - new Date(b.date));
 
   // Сортировка рекламаций по дате отказа
   const sortedReclamations = [...reclamations].sort((a, b) => new Date(a.failure_date) - new Date(b.failure_date));
@@ -150,38 +152,74 @@ const Dashboard = () => {
     });
   };
 
-  useEffect(() => {
-    if (selectedMachineSerialNumber) {
-      const selectedMachine = machines.find(machine => machine.serial_number === selectedMachineSerialNumber);
-      if (selectedMachine) {
-        const machineId = selectedMachine.id;
-        console.log('Selected Machine TO ID:', machineId);
-        api.get('/maintenances/')
-          .then(response => {
-            const sortedMaintenances = response.data.sort((a, b) => new Date(a.date) - new Date(b.date));
-          setMaintenances(sortedMaintenances);
-            const filteredMaintenances = response.data.filter(
-              maintenance => maintenance.machine === machineId
-            );
-            console.log('Filtered Maintenances!!!:', filteredMaintenances);
-            setMaintenances(filteredMaintenances);
-          })
-          .catch(error => console.error('Ошибка при получении данных ТО:', error));
 
-        api.get('/reclamations/')
-          .then(response => {
-            const filteredReclamations = response.data.filter(
-              reclamation => reclamation.machine === machineId
-            );
-            console.log('Filtered Reclamations:', filteredReclamations);
-            setReclamations(filteredReclamations);
-          })
-          .catch(error => console.error('Ошибка при получении данных рекламаций:', error));
-      } else {
-        console.log('No machine found with serial number:', selectedMachineSerialNumber);
-      }
+  
+useEffect(() => {
+  if (selectedMachineSerialNumber) {
+    const selectedMachine = machines.find(machine => machine.serial_number === selectedMachineSerialNumber);
+    if (selectedMachine) {
+      const machineId = selectedMachine.id;
+      // console.log('Selected Machine TO ID:', machineId);
+
+      api.get('/maintenances/')
+        .then(response => {
+          const filteredMaintenances = response.data
+            .filter(maintenance => maintenance.machine === machineId)
+            .sort((a, b) => new Date(a.date) - new Date(b.date)); // Сортируем после фильтрации
+
+          console.log('Filtered Maintenances:', filteredMaintenances);
+          setMaintenances(filteredMaintenances);
+        })
+        .catch(error => console.error('Ошибка при получении данных ТО:', error));
+
+      api.get('/reclamations/')
+        .then(response => {
+          const filteredReclamations = response.data.filter(
+            reclamation => reclamation.machine === machineId
+          );
+          // console.log('Filtered Reclamations:', filteredReclamations);
+          setReclamations(filteredReclamations);
+        })
+        .catch(error => console.error('Ошибка при получении данных рекламаций:', error));
+    } else {
+      console.log('No machine found with serial number:', selectedMachineSerialNumber);
     }
-  }, [selectedMachineSerialNumber, machines]);
+  }
+}, [selectedMachineSerialNumber, machines]);
+
+
+  // useEffect(() => {
+  //   if (selectedMachineSerialNumber) {
+  //     const selectedMachine = machines.find(machine => machine.serial_number === selectedMachineSerialNumber);
+  //     if (selectedMachine) {
+  //       const machineId = selectedMachine.id;
+  //       console.log('Selected Machine TO ID:', machineId);
+  //       api.get('/maintenances/')
+  //         .then(response => {
+  //           const sortedMaintenances = response.data.sort((a, b) => new Date(a.date) - new Date(b.date));
+  //         setMaintenances(sortedMaintenances);
+  //           const filteredMaintenances = response.data.filter(
+  //             maintenance => maintenance.machine === machineId
+  //           );
+  //           console.log('Filtered Maintenances!!!:', filteredMaintenances);
+  //           setMaintenances(filteredMaintenances);
+  //         })
+  //         .catch(error => console.error('Ошибка при получении данных ТО:', error));
+
+  //       api.get('/reclamations/')
+  //         .then(response => {
+  //           const filteredReclamations = response.data.filter(
+  //             reclamation => reclamation.machine === machineId
+  //           );
+  //           console.log('Filtered Reclamations:', filteredReclamations);
+  //           setReclamations(filteredReclamations);
+  //         })
+  //         .catch(error => console.error('Ошибка при получении данных рекламаций:', error));
+  //     } else {
+  //       console.log('No machine found with serial number:', selectedMachineSerialNumber);
+  //     }
+  //   }
+  // }, [selectedMachineSerialNumber, machines]);
 
 
   const handleAddData = () => {
@@ -288,19 +326,41 @@ const Dashboard = () => {
     setSelectedMachineSerialNumber(serialNumber);
   };
 
-    // Применение фильтров для рекламаций
-  // const filteredMaintenances = maintenances.filter(maintenance => 
-  //   maintenance.type_name.toLowerCase().includes(maintenanceFilters.type.toLowerCase()) &&
-  //   maintenance.machine_serial_number.toLowerCase().includes(maintenanceFilters.machineSerial.toLowerCase()) &&
-  //   maintenance.service_company_name.toLowerCase().includes(maintenanceFilters.serviceCompany.toLowerCase())
-  // );
+  // Применение фильтров для рекламаций
 
-  // const handleMaintenanceFilterChange = (e) => {
-  //   setMaintenanceFilters({
-  //     ...maintenanceFilters,
-  //     [e.target.name]: e.target.value,
-  //   });
-  // };
+  const filteredMaintenances = maintenances.filter(maintenance => {
+    const typeName = maintenance.type ? maintenance.type.toLowerCase().trim() : '';
+    const machineName = maintenance.machine_name ? maintenance.machine_name.toLowerCase().trim() : '';
+    const serviceCompanyName = maintenance.service_company ? maintenance.service_company.toLowerCase().trim() : '';
+  
+    const filterTypeName = maintenanceFilters.type.toLowerCase().trim();
+    const filterMachineSerialNumber = maintenanceFilters.machineSerialNumber.toLowerCase().trim();
+    const filterServiceCompanyName = maintenanceFilters.serviceCompany.toLowerCase().trim();
+  
+    // Диагностика
+    console.log("Сравнение A:", machineName, filterMachineSerialNumber);
+    console.log("Длина A:", machineName.length, "Длина B:", filterMachineSerialNumber.length);
+    console.log("Сравнение boolean:", machineName.includes(filterMachineSerialNumber));
+  
+    return (
+      typeName.includes(filterTypeName) &&
+      machineName.includes(filterMachineSerialNumber) &&
+      serviceCompanyName.includes(filterServiceCompanyName)
+    );
+  });
+  
+  
+  console.log("Отфильтрованные данные:", filteredMaintenances);
+  
+
+  const handleMaintenanceFilterChange = (e) => {
+    const { name, value } = e.target;
+    setMaintenanceFilters({
+      ...maintenanceFilters,
+      [name]: value, // Убедитесь, что value не undefined
+    });
+  };
+  
 
   const canAddMachine = userInfo && userInfo.role === 'manager';
   const canAddMaintenance = userInfo && (userInfo.role === 'client' || userInfo.role === 'service' || userInfo.role === 'manager');
@@ -489,51 +549,93 @@ const Dashboard = () => {
              </div>
           )}
 
-{activeTab === 'maintenances' && (
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Вид ТО</th>
-                <th>Дата проведения ТО</th>
-                <th>Операционные часы</th>
-                <th>№ заказ-наряда</th>
-                <th>Дата заказ-наряда</th>
-                <th>Организация, проводившая ТО</th>
-                <th>Машина</th>
-                {/* <th>Сервисная компания</th> */}
-                <th>Действия</th>
-              </tr>
-            </thead>
-            <tbody>
-              {maintenances.length > 0 ? (
-                sortedMaintenances.map((maintenance) => (
-                  <tr key={maintenance.id}>
-                    <td>{maintenance.type}</td>
-                    <td>{maintenance.date}</td>
-                    <td>{maintenance.operating_hours}</td>
-                    <td>{maintenance.order_number}</td>
-                    <td>{maintenance.order_date}</td>
-                    <td>{maintenance.service_company}</td>
-                    <td>{maintenance.machine_name}</td>
-                    {/* <td>{maintenance.service_company_name}</td> */}
-                    <td>
-                      {canAddMaintenance && (
-                        <>
-                          <Button variant="success" onClick={handleAddData}>Добавить</Button>
-                          <Button variant="warning" onClick={() => handleEditData(maintenance)}>Редактировать</Button>
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5">Нет данных о ТО для выбранной машины</td>
-                </tr>
-              )}
-            </tbody>
-          </Table>
+
+
+<div>
+  <Form>
+    <Row className="align-items-center mb-3">
+      <Col><Form.Label>Вид ТО</Form.Label></Col>
+      <Col><Form.Label>Зав. номер машины</Form.Label></Col>
+      <Col><Form.Label>Сервисная компания</Form.Label></Col>
+    </Row>
+    <Row className="align-items-center">
+      <Col>
+        <Form.Control
+          type="text"
+          placeholder="Фильтр по виду ТО"
+          name="type"
+          value={maintenanceFilters.type}
+          onChange={handleMaintenanceFilterChange}
+        />
+      </Col>
+      <Col>
+        <Form.Control
+          type="text"
+          placeholder="Фильтр по зав. номеру машины"
+          name="machineSerialNumber"
+          value={maintenanceFilters.machineSerialNumber}
+          onChange={handleMaintenanceFilterChange}
+        />
+      </Col>
+      <Col>
+        <Form.Control
+          type="text"
+          placeholder="Фильтр по сервисной компании"
+          name="serviceCompany"
+          value={maintenanceFilters.serviceCompany}
+          onChange={handleMaintenanceFilterChange}
+        />
+      </Col>
+    </Row>
+  </Form>
+
+  {activeTab === 'maintenances' && (
+    <Table striped bordered hover>
+      <thead>
+        <tr>
+          <th>Вид ТО</th>
+          <th>Дата проведения ТО</th>
+          <th>Операционные часы</th>
+          <th>№ заказ-наряда</th>
+          <th>Дата заказ-наряда</th>
+          <th>Организация, проводившая ТО</th>
+          <th>Машина</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {filteredMaintenances.length > 0 ? (
+          filteredMaintenances.map((maintenance) => (
+            <tr key={maintenance.id}>
+              <td>{maintenance.type}</td>
+              <td>{maintenance.date}</td>
+              <td>{maintenance.operating_hours}</td>
+              <td>{maintenance.order_number}</td>
+              <td>{maintenance.order_date}</td>
+              <td>{maintenance.service_company}</td>
+              <td>{maintenance.machine_name}</td>
+              <td>
+                {canAddMaintenance && (
+                  <>
+                    <Button variant="success" onClick={handleAddData}>Добавить</Button>
+                    <Button variant="warning" onClick={() => handleEditData(maintenance)}>Редактировать</Button>
+                  </>
+                )}
+              </td>
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td colSpan="8">Нет данных о ТО для выбранной машины</td>
+          </tr>
         )}
+      </tbody>
+    </Table>
+  )}
+</div>
+
+
+
 
 {activeTab === 'reclamations' && (
           <Table striped bordered hover>
