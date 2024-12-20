@@ -3,6 +3,7 @@ import { Container, Row, Col, Button, Table, Modal, Form } from 'react-bootstrap
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import api from '../api';
+import { addMachine, updateMachine } from '../api';
 import './HomePage.css'; // Импортируйте стили
 
 const Dashboard = () => {
@@ -131,14 +132,6 @@ const Dashboard = () => {
     }
   }, [isAuthenticated]);
 
-    // // Сортировка машин по дате отгрузки
-    // const sortedMachines = [...machines].sort((a, b) => {
-    //   const dateA = new Date(a.shipment_date);
-    //   const dateB = new Date(b.shipment_date);
-    //   return dateA - dateB;
-    // });
-
-
       // Сортировка машин по дате отгрузки
   // const sortedMachines = [...machines].sort((a, b) => new Date(a.shipment_date) - new Date(b.shipment_date));
 
@@ -192,41 +185,6 @@ useEffect(() => {
     }
   }
 }, [selectedMachineSerialNumber, machines]);
-
-
-  // useEffect(() => {
-  //   if (selectedMachineSerialNumber) {
-  //     const selectedMachine = machines.find(machine => machine.serial_number === selectedMachineSerialNumber);
-  //     if (selectedMachine) {
-  //       const machineId = selectedMachine.id;
-  //       console.log('Selected Machine TO ID:', machineId);
-  //       api.get('/maintenances/')
-  //         .then(response => {
-  //           const sortedMaintenances = response.data.sort((a, b) => new Date(a.date) - new Date(b.date));
-  //         setMaintenances(sortedMaintenances);
-  //           const filteredMaintenances = response.data.filter(
-  //             maintenance => maintenance.machine === machineId
-  //           );
-  //           console.log('Filtered Maintenances!!!:', filteredMaintenances);
-  //           setMaintenances(filteredMaintenances);
-  //         })
-  //         .catch(error => console.error('Ошибка при получении данных ТО:', error));
-
-  //       api.get('/reclamations/')
-  //         .then(response => {
-  //           const filteredReclamations = response.data.filter(
-  //             reclamation => reclamation.machine === machineId
-  //           );
-  //           console.log('Filtered Reclamations:', filteredReclamations);
-  //           setReclamations(filteredReclamations);
-  //         })
-  //         .catch(error => console.error('Ошибка при получении данных рекламаций:', error));
-  //     } else {
-  //       console.log('No machine found with serial number:', selectedMachineSerialNumber);
-  //     }
-  //   }
-  // }, [selectedMachineSerialNumber, machines]);
-
 
   const handleAddData = () => {
     setIsEditMode(false);
@@ -351,10 +309,10 @@ useEffect(() => {
     const filterMachineSerialNumber = maintenanceFilters.machineSerialNumber.toLowerCase().trim();
     const filterServiceCompanyName = maintenanceFilters.serviceCompany.toLowerCase().trim();
   
-    // Диагностика
-    console.log("Сравнение A:", machineName, filterMachineSerialNumber);
-    console.log("Длина A:", machineName.length, "Длина B:", filterMachineSerialNumber.length);
-    console.log("Сравнение boolean:", machineName.includes(filterMachineSerialNumber));
+    // // Диагностика
+    // console.log("Сравнение A:", machineName, filterMachineSerialNumber);
+    // console.log("Длина A:", machineName.length, "Длина B:", filterMachineSerialNumber.length);
+    // console.log("Сравнение boolean:", machineName.includes(filterMachineSerialNumber));
   
     return (
       typeName.includes(filterTypeName) &&
@@ -363,10 +321,6 @@ useEffect(() => {
     );
   });
   
-
-
-  
-
   
 const handleReclamationFilterChange = (e) => {
   const { name, value } = e.target;
@@ -408,42 +362,59 @@ const filteredReclamations = enrichedReclamations.filter(reclamation => {
   );
 });
 
-// const filteredReclamations = reclamations.filter(reclamation => {
-//   const failureNode = reclamation.failure_node ? reclamation.failure_node.toLowerCase().trim() : '';
-//   const recoveryMethodName = getRecoveryMethodName(reclamation.recovery_method).toLowerCase().trim();
-//   const serviceCompanyName = reclamation.service_company ? reclamation.service_company.toLowerCase().trim() : '';
-
-//   const filterFailureNode = reclamationFilters.failureNode.toLowerCase().trim();
-//   const filterRecoveryMethod = reclamationFilters.recoveryMethod.toLowerCase().trim();
-//   const filterServiceCompany = reclamationFilters.serviceCompany.toLowerCase().trim();
-
-//   return (
-//     failureNode.includes(filterFailureNode) &&
-//     recoveryMethodName.includes(filterRecoveryMethod) &&
-//     serviceCompanyName.includes(filterServiceCompany)
-//   );
-// });
-
-
-
-// const machineToServiceMap = {};
-// maintenances.forEach(maintenance => {
-//   if (maintenance.machine_name && maintenance.service_company) {
-//     machineToServiceMap[maintenance.machine_name] = maintenance.service_company;
-//   }
-// });
-
-
-// const enrichedReclamations = reclamations.map(reclamation => ({
-//   ...reclamation,
-//   service_company: machineToServiceMap[reclamation.machine_name] || 'Неизвестно',
-// }));
-
-
-
   const canAddMachine = userInfo && userInfo.role === 'manager';
   const canAddMaintenance = userInfo && (userInfo.role === 'client' || userInfo.role === 'service' || userInfo.role === 'manager');
   const canAddReclamation = userInfo && (userInfo.role === 'service' || userInfo.role === 'manager');
+
+
+
+// const handleSave = () => {
+//   if (isEditMode) {
+//     updateMachine(formData)
+//       .then(response => {
+//         // Обновите состояние, чтобы отобразить изменения
+//         // Например, обновите список машин
+//         setMachines(prevMachines => prevMachines.map(machine => machine.id === response.id ? response : machine));
+//         handleCloseModal();
+//       })
+//       .catch(error => {
+//         console.error('Ошибка при обновлении машины:', error);
+//       });
+//   } else {
+//     addMachine(formData)
+//       .then(response => {
+//         // Добавьте новую машину в список
+//         setMachines(prevMachines => [...prevMachines, response]);
+//         handleCloseModal();
+//       })
+//       .catch(error => {
+//         console.error('Ошибка при добавлении машины:', error);
+//       });
+//   }
+// };
+
+// // Обработчик сохранения
+// const handleSave = () => {
+//   if (isEditMode) {
+//     updateMachine(formData)
+//       .then(response => {
+//         setMachines(prevMachines => prevMachines.map(machine => machine.id === response.id ? response : machine));
+//         handleCloseModal();
+//       })
+//       .catch(error => {
+//         console.error('Ошибка при обновлении машины:', error);
+//       });
+//   } else {
+//     addMachine(formData)
+//       .then(response => {
+//         setMachines(prevMachines => [...prevMachines, response]);
+//         handleCloseModal();
+//       })
+//       .catch(error => {
+//         console.error('Ошибка при добавлении машины:', error);
+//       });
+//   }
+// };
 
   return (
     <div>
@@ -466,7 +437,7 @@ const filteredReclamations = enrichedReclamations.filter(reclamation => {
 
       <Container className="main-content">
       <div className="user-info-box">
-  <h3>{userInfo && userInfo.username}</h3>
+      <h3>{userInfo && `${userInfo.userRole} ${userInfo.username}`}</h3>
 </div>
 <div className="info-box">
   <p>Информация о комплектации и технических характеристиках Вашей техники</p>
