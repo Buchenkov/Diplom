@@ -45,6 +45,12 @@ const Dashboard = () => {
     machineSerialNumber: '',
     serviceCompany: '',
   });
+
+  const [reclamationFilters, setReclamationFilters] = useState({
+    failureNode: '',
+    recoveryMethod: '',
+    serviceCompany: '',
+  });
   
 
   useEffect(() => {
@@ -140,7 +146,7 @@ const Dashboard = () => {
   // const sortedMaintenances = [...maintenances].sort((a, b) => new Date(a.date) - new Date(b.date));
 
   // Сортировка рекламаций по дате отказа
-  const sortedReclamations = [...reclamations].sort((a, b) => new Date(a.failure_date) - new Date(b.failure_date));
+  // const sortedReclamations = [...reclamations].sort((a, b) => new Date(a.failure_date) - new Date(b.failure_date));
 
 
 
@@ -326,6 +332,14 @@ useEffect(() => {
     setSelectedMachineSerialNumber(serialNumber);
   };
 
+
+  const handleMaintenanceFilterChange = (e) => {
+    const { name, value } = e.target;
+    setMaintenanceFilters({
+      ...maintenanceFilters,
+      [name]: value, 
+    });
+  };
   // Применение фильтров для рекламаций
 
   const filteredMaintenances = maintenances.filter(maintenance => {
@@ -349,18 +363,83 @@ useEffect(() => {
     );
   });
   
-  
-  console.log("Отфильтрованные данные:", filteredMaintenances);
+
+
   
 
-  const handleMaintenanceFilterChange = (e) => {
-    const { name, value } = e.target;
-    setMaintenanceFilters({
-      ...maintenanceFilters,
-      [name]: value, // Убедитесь, что value не undefined
-    });
-  };
   
+const handleReclamationFilterChange = (e) => {
+  const { name, value } = e.target;
+  setReclamationFilters({
+    ...reclamationFilters,
+    [name]: value,
+  });
+};
+
+
+// Создаем маппинг машины к сервисной компании из данных "ТО"
+const machineToServiceMap = {};
+maintenances.forEach(maintenance => {
+  if (maintenance.machine_name && maintenance.service_company) {
+    machineToServiceMap[maintenance.machine_name] = maintenance.service_company;
+  }
+});
+
+// Обогащаем данные "Рекламаций" информацией о сервисной компании
+const enrichedReclamations = reclamations.map(reclamation => ({
+  ...reclamation,
+  service_company: machineToServiceMap[reclamation.machine_name] || 'Неизвестно',
+}));
+
+// Фильтруем обогащенные данные "Рекламаций"
+const filteredReclamations = enrichedReclamations.filter(reclamation => {
+  const failureNode = reclamation.failure_node ? reclamation.failure_node.toLowerCase().trim() : '';
+  const recoveryMethodName = getRecoveryMethodName(reclamation.recovery_method).toLowerCase().trim();
+  const serviceCompanyName = reclamation.service_company.toLowerCase().trim();
+
+  const filterFailureNode = reclamationFilters.failureNode.toLowerCase().trim();
+  const filterRecoveryMethod = reclamationFilters.recoveryMethod.toLowerCase().trim();
+  const filterServiceCompany = reclamationFilters.serviceCompany.toLowerCase().trim();
+
+  return (
+    failureNode.includes(filterFailureNode) &&
+    recoveryMethodName.includes(filterRecoveryMethod) &&
+    serviceCompanyName.includes(filterServiceCompany)
+  );
+});
+
+// const filteredReclamations = reclamations.filter(reclamation => {
+//   const failureNode = reclamation.failure_node ? reclamation.failure_node.toLowerCase().trim() : '';
+//   const recoveryMethodName = getRecoveryMethodName(reclamation.recovery_method).toLowerCase().trim();
+//   const serviceCompanyName = reclamation.service_company ? reclamation.service_company.toLowerCase().trim() : '';
+
+//   const filterFailureNode = reclamationFilters.failureNode.toLowerCase().trim();
+//   const filterRecoveryMethod = reclamationFilters.recoveryMethod.toLowerCase().trim();
+//   const filterServiceCompany = reclamationFilters.serviceCompany.toLowerCase().trim();
+
+//   return (
+//     failureNode.includes(filterFailureNode) &&
+//     recoveryMethodName.includes(filterRecoveryMethod) &&
+//     serviceCompanyName.includes(filterServiceCompany)
+//   );
+// });
+
+
+
+// const machineToServiceMap = {};
+// maintenances.forEach(maintenance => {
+//   if (maintenance.machine_name && maintenance.service_company) {
+//     machineToServiceMap[maintenance.machine_name] = maintenance.service_company;
+//   }
+// });
+
+
+// const enrichedReclamations = reclamations.map(reclamation => ({
+//   ...reclamation,
+//   service_company: machineToServiceMap[reclamation.machine_name] || 'Неизвестно',
+// }));
+
+
 
   const canAddMachine = userInfo && userInfo.role === 'manager';
   const canAddMaintenance = userInfo && (userInfo.role === 'client' || userInfo.role === 'service' || userInfo.role === 'manager');
@@ -550,140 +629,184 @@ useEffect(() => {
           )}
 
 
-
 <div>
-  <Form>
-    <Row className="align-items-center mb-3">
-      <Col><Form.Label>Вид ТО</Form.Label></Col>
-      <Col><Form.Label>Зав. номер машины</Form.Label></Col>
-      <Col><Form.Label>Сервисная компания</Form.Label></Col>
-    </Row>
-    <Row className="align-items-center">
-      <Col>
-        <Form.Control
-          type="text"
-          placeholder="Фильтр по виду ТО"
-          name="type"
-          value={maintenanceFilters.type}
-          onChange={handleMaintenanceFilterChange}
-        />
-      </Col>
-      <Col>
-        <Form.Control
-          type="text"
-          placeholder="Фильтр по зав. номеру машины"
-          name="machineSerialNumber"
-          value={maintenanceFilters.machineSerialNumber}
-          onChange={handleMaintenanceFilterChange}
-        />
-      </Col>
-      <Col>
-        <Form.Control
-          type="text"
-          placeholder="Фильтр по сервисной компании"
-          name="serviceCompany"
-          value={maintenanceFilters.serviceCompany}
-          onChange={handleMaintenanceFilterChange}
-        />
-      </Col>
-    </Row>
-  </Form>
-
   {activeTab === 'maintenances' && (
-    <Table striped bordered hover>
-      <thead>
-        <tr>
-          <th>Вид ТО</th>
-          <th>Дата проведения ТО</th>
-          <th>Операционные часы</th>
-          <th>№ заказ-наряда</th>
-          <th>Дата заказ-наряда</th>
-          <th>Организация, проводившая ТО</th>
-          <th>Машина</th>
-          <th>Действия</th>
-        </tr>
-      </thead>
-      <tbody>
-        {filteredMaintenances.length > 0 ? (
-          filteredMaintenances.map((maintenance) => (
-            <tr key={maintenance.id}>
-              <td>{maintenance.type}</td>
-              <td>{maintenance.date}</td>
-              <td>{maintenance.operating_hours}</td>
-              <td>{maintenance.order_number}</td>
-              <td>{maintenance.order_date}</td>
-              <td>{maintenance.service_company}</td>
-              <td>{maintenance.machine_name}</td>
-              <td>
-                {canAddMaintenance && (
-                  <>
-                    <Button variant="success" onClick={handleAddData}>Добавить</Button>
-                    <Button variant="warning" onClick={() => handleEditData(maintenance)}>Редактировать</Button>
-                  </>
-                )}
-              </td>
-            </tr>
-          ))
-        ) : (
+    <>
+      <Form>
+        <Row className="align-items-center mb-3">
+          <Col><Form.Label>Вид ТО</Form.Label></Col>
+          <Col><Form.Label>Зав. номер машины</Form.Label></Col>
+          <Col><Form.Label>Сервисная компания</Form.Label></Col>
+        </Row>
+        <Row className="align-items-center">
+          <Col>
+            <Form.Control
+              type="text"
+              placeholder="Фильтр по виду ТО"
+              name="type"
+              value={maintenanceFilters.type}
+              onChange={handleMaintenanceFilterChange}
+            />
+          </Col>
+          <Col>
+            <Form.Control
+              type="text"
+              placeholder="Фильтр по зав. номеру машины"
+              name="machineSerialNumber"
+              value={maintenanceFilters.machineSerialNumber}
+              onChange={handleMaintenanceFilterChange}
+            />
+          </Col>
+          <Col>
+            <Form.Control
+              type="text"
+              placeholder="Фильтр по сервисной компании"
+              name="serviceCompany"
+              value={maintenanceFilters.serviceCompany}
+              onChange={handleMaintenanceFilterChange}
+            />
+          </Col>
+        </Row>
+      </Form>
+
+      <Table striped bordered hover>
+        <thead>
           <tr>
-            <td colSpan="8">Нет данных о ТО для выбранной машины</td>
+            <th>Вид ТО</th>
+            <th>Дата проведения ТО</th>
+            <th>Операционные часы</th>
+            <th>№ заказ-наряда</th>
+            <th>Дата заказ-наряда</th>
+            <th>Организация, проводившая ТО</th>
+            <th>Машина</th>
+            <th>Действия</th>
           </tr>
-        )}
-      </tbody>
-    </Table>
+        </thead>
+        <tbody>
+          {filteredMaintenances.length > 0 ? (
+            filteredMaintenances.map((maintenance) => (
+              <tr key={maintenance.id}>
+                <td>{maintenance.type}</td>
+                <td>{maintenance.date}</td>
+                <td>{maintenance.operating_hours}</td>
+                <td>{maintenance.order_number}</td>
+                <td>{maintenance.order_date}</td>
+                <td>{maintenance.service_company}</td>
+                <td>{maintenance.machine_name}</td>
+                <td>
+                  {canAddMaintenance && (
+                    <>
+                      <Button variant="success" onClick={handleAddData}>Добавить</Button>
+                      <Button variant="warning" onClick={() => handleEditData(maintenance)}>Редактировать</Button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="8">Нет данных о ТО для выбранной машины</td>
+            </tr>
+          )}
+        </tbody>
+      </Table>
+    </>
   )}
 </div>
 
 
 
+<div>
+  {activeTab === 'reclamations' && (
+    <>
+      <Form>
+        <Row className="align-items-center mb-3">
+          <Col><Form.Label>Узел отказа</Form.Label></Col>
+          <Col><Form.Label>Способ восстановления</Form.Label></Col>
+          <Col><Form.Label>Сервисная компания</Form.Label></Col>
+        </Row>
+        <Row className="align-items-center">
+          <Col>
+            <Form.Control
+              type="text"
+              placeholder="Фильтр по узлу отказа"
+              name="failureNode"
+              value={reclamationFilters.failureNode}
+              onChange={handleReclamationFilterChange}
+            />
+          </Col>
+          <Col>
+            <Form.Control
+              type="text"
+              placeholder="Фильтр по способу восстановления"
+              name="recoveryMethod"
+              value={reclamationFilters.recoveryMethod}
+              onChange={handleReclamationFilterChange}
+            />
+          </Col>
+          <Col>
+            <Form.Control
+              type="text"
+              placeholder="Фильтр по сервисной компании"
+              name="serviceCompany"
+              value={reclamationFilters.serviceCompany}
+              onChange={handleReclamationFilterChange}
+            />
+          </Col>
+        </Row>
+      </Form>
 
-{activeTab === 'reclamations' && (
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Дата отказа</th>
-                <th>Наработка, м/час</th>
-                <th>Узел отказа</th>
-                <th>Описание</th>
-                <th>Способ восстановления</th>
-                <th>Используемые запасные части</th>
-                <th>Дата восстановления</th>
-                <th>Время простоя техники</th>
-                <th>Mашина</th>
-                <th>Действия</th>
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>Дата отказа</th>
+            <th>Наработка, м/час</th>
+            <th>Узел отказа</th>
+            <th>Описание</th>
+            <th>Способ восстановления</th>
+            <th>Используемые запасные части</th>
+            <th>Дата восстановления</th>
+            <th>Время простоя техники</th>
+            <th>Mашина</th>
+            <th>Сервисная компания</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredReclamations.length > 0 ? (
+            filteredReclamations.map(reclamation => (
+              <tr key={reclamation.id}>
+                <td>{reclamation.failure_date}</td>
+                <td>{reclamation.operating_hours}</td>
+                <td>{reclamation.failure_node}</td>
+                <td>{reclamation.description}</td>
+                <td>{getRecoveryMethodName(reclamation.recovery_method)}</td>
+                <td>{reclamation.spare_parts}</td>
+                <td>{reclamation.restoration_date}</td>
+                <td>{reclamation.downtime}</td>
+                <td>{reclamation.machine_name}</td>
+                <td>{reclamation.service_company}</td>
+                <td>
+                  {canAddReclamation && (
+                    <>
+                      <Button variant="success" onClick={handleAddData}>Добавить</Button>
+                      <Button variant="warning" onClick={() => handleEditData(reclamation)}>Редактировать</Button>
+                    </>
+                  )}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {reclamations.length > 0 ? (
-                sortedReclamations.map((reclamation) => (
-                  <tr key={reclamation.id}>
-                    <td>{reclamation.failure_date}</td>
-                    <td>{reclamation.operating_hours}</td>
-                    <td>{reclamation.failure_node}</td>
-                    <td>{reclamation.description}</td>
-                    <td>{getRecoveryMethodName(reclamation.recovery_method)}</td>
-                    <td>{reclamation.spare_parts}</td>
-                    <td>{reclamation.restoration_date}</td>
-                    <td>{reclamation.downtime}</td>
-                    <td>{reclamation.machine_name}</td>
-                    <td>
-                      {canAddReclamation && (
-                        <>
-                          <Button variant="success" onClick={handleAddData}>Добавить</Button>
-                          <Button variant="warning" onClick={() => handleEditData(reclamation)}>Редактировать</Button>
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="7">Нет данныхо рекламациях для выбранной машины</td>
-                </tr>
-              )}
-            </tbody>
-          </Table>
-        )}
+            ))
+          ) : (
+            <tr>
+              <td colSpan="10">Нет данных о рекламациях для выбранной машины</td>
+            </tr>
+          )}
+        </tbody>
+      </Table>
+    </>
+  )}
+</div>
+
       </Container>
 
       <footer className="custom-footer">
