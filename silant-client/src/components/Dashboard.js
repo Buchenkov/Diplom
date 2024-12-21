@@ -54,6 +54,8 @@ const Dashboard = () => {
   });
   
 
+ 
+
   useEffect(() => {
     if (isAuthenticated) {
       // console.log('Fetching user info');
@@ -154,37 +156,37 @@ const Dashboard = () => {
 
   
 useEffect(() => {
-  if (selectedMachineSerialNumber) {
-    const selectedMachine = machines.find(machine => machine.serial_number === selectedMachineSerialNumber);
-    if (selectedMachine) {
-      const machineId = selectedMachine.id;
-      // console.log('Selected Machine TO ID:', machineId);
+  if (machines.length > 0) {
+    // Получаем все ID машин доступных пользователю
+    const machineIds = machines.map(machine => machine.id);
 
-      api.get('/maintenances/')
-        .then(response => {
-          const filteredMaintenances = response.data
-            .filter(maintenance => maintenance.machine === machineId)
-            .sort((a, b) => new Date(a.date) - new Date(b.date)); // Сортируем после фильтрации
+    // Загружаем все данные для ТО
+    api.get('/maintenances/')
+      .then(response => {
+        // Фильтруем данные ТО по всем доступным машинам
+        const filteredMaintenances = response.data
+          .filter(maintenance => machineIds.includes(maintenance.machine))
+          .sort((a, b) => new Date(a.date) - new Date(b.date)); // Сортируем после фильтрации
 
-          console.log('Filtered Maintenances:', filteredMaintenances);
-          setMaintenances(filteredMaintenances);
-        })
-        .catch(error => console.error('Ошибка при получении данных ТО:', error));
+        console.log('Filtered Maintenances:', filteredMaintenances);
+        setMaintenances(filteredMaintenances);
+      })
+      .catch(error => console.error('Ошибка при получении данных ТО:', error));
 
-      api.get('/reclamations/')
-        .then(response => {
-          const filteredReclamations = response.data.filter(
-            reclamation => reclamation.machine === machineId
-          );
-          // console.log('Filtered Reclamations:', filteredReclamations);
-          setReclamations(filteredReclamations);
-        })
-        .catch(error => console.error('Ошибка при получении данных рекламаций:', error));
-    } else {
-      console.log('No machine found with serial number:', selectedMachineSerialNumber);
-    }
+    // Загружаем все данные для рекламаций
+    api.get('/reclamations/')
+      .then(response => {
+        // Фильтруем данные рекламаций по всем доступным машинам
+        const filteredReclamations = response.data.filter(
+          reclamation => machineIds.includes(reclamation.machine)
+        );
+        console.log('Filtered Reclamations:', filteredReclamations);
+        setReclamations(filteredReclamations);
+      })
+      .catch(error => console.error('Ошибка при получении данных рекламаций:', error));
   }
-}, [selectedMachineSerialNumber, machines]);
+}, [machines]);
+
 
   const handleAddData = () => {
     setIsEditMode(false);
@@ -285,10 +287,10 @@ useEffect(() => {
     getSteerAxleModelName(machine.steer_axle_model).toLowerCase().includes(filters.steerAxleModel.toLowerCase())
   );
 
-  const handleMachineSelect = (serialNumber) => {
-    console.log('Machine selected:', serialNumber);
-    setSelectedMachineSerialNumber(serialNumber);
-  };
+  // const handleMachineSelect = (serialNumber) => {
+  //   console.log('Machine selected:', serialNumber);
+  //   setSelectedMachineSerialNumber(serialNumber);
+  // };
 
 
   const handleMaintenanceFilterChange = (e) => {
@@ -437,7 +439,7 @@ const filteredReclamations = enrichedReclamations.filter(reclamation => {
 
       <Container className="main-content">
       <div className="user-info-box">
-      <h3>{userInfo && `${userInfo.userRole} ${userInfo.username}`}</h3>
+      <h3>{userInfo && userInfo.username}</h3>
 </div>
 <div className="info-box">
   <p>Информация о комплектации и технических характеристиках Вашей техники</p>
@@ -558,13 +560,13 @@ const filteredReclamations = enrichedReclamations.filter(reclamation => {
               <tbody>
               {filteredMachines.map((machine) => (
                   <tr
-                    key={machine.id}
-                    onClick={() => handleMachineSelect(machine.serial_number)}
-                    style={{
-                      backgroundColor: selectedMachineSerialNumber === machine.serial_number ? '#afd7ff' : '',
-                      fontWeight: selectedMachineSerialNumber === machine.serial_number ? 'bold' : 'normal',
-                      cursor: 'pointer'
-                    }}
+                    // key={machine.id}
+                    // onClick={() => handleMachineSelect(machine.serial_number)}
+                    // style={{
+                    //   backgroundColor: selectedMachineSerialNumber === machine.serial_number ? '#afd7ff' : '',
+                    //   fontWeight: selectedMachineSerialNumber === machine.serial_number ? 'bold' : 'normal',
+                    //   cursor: 'pointer'
+                    // }}
                   >
                     <td>{machine.serial_number}</td>
                     <td>{machine.model}</td>
